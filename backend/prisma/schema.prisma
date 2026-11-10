@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GarageSettings {
+  id                 String   @id @default("singleton")
+  openingTime        String   @default("09:00")
+  closingTime        String   @default("21:00")
+  slotLengthMin      Int      @default(60)
+  capacityPerSlot    Int      @default(5)
+  weeklyOffDays      Int[]    @default([5]) // 0 = Sunday ... 5 = Friday
+  timezone           String   @default("Asia/Kolkata")
+  advanceBookingDays Int      @default(30)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("garage_settings")
+}
