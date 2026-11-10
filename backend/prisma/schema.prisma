@@ -21,3 +21,243 @@ model GarageSettings {
 
   @@map("garage_settings")
 }
+
+// ---------- Enums ----------
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  RECEPTIONIST
+  MECHANIC
+}
+
+enum MotorcycleType {
+  SCOOTER
+  COMMUTER
+  SPORTS
+  CRUISER
+  ADVENTURE
+  ELECTRIC
+  OTHER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CUSTOMER_ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum BookingSource {
+  ONLINE
+  ADMIN
+}
+
+// ---------- Users and staff ----------
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  phone        String?
+  passwordHash String
+  role         Role
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  refreshTokens RefreshToken[]
+  staffProfile  StaffProfile?
+  assignedJobs  Booking[]              @relation("AssignedMechanic")
+  statusChanges BookingStatusHistory[]
+  addedItems    BookingItem[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?
+  ip        String?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model StaffProfile {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  designation String?
+  joinedOn    DateTime?
+  salaryPaise Int?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("staff_profiles")
+}
+
+// ---------- Customers and motorcycles ----------
+model Customer {
+  id             String   @id @default(uuid())
+  customerNumber Int      @unique @default(autoincrement())
+  name           String
+  phone          String   @unique
+  email          String?
+  address        String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  motorcycles Motorcycle[]
+  bookings    Booking[]
+
+  @@map("customers")
+}
+
+model Motorcycle {
+  id                 String         @id @default(uuid())
+  customerId         String
+  brand              String
+  model              String
+  registrationNumber String         @unique
+  manufacturingYear  Int?
+  type               MotorcycleType @default(COMMUTER)
+  chassisNumber      String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  customer Customer  @relation(fields: [customerId], references: [id])
+  bookings Booking[]
+
+  @@index([customerId])
+  @@map("motorcycles")
+}
+
+// ---------- Services ----------
+model ServiceCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  services Service[]
+
+  @@map("service_categories")
+}
+
+model Service {
+  id                   String   @id @default(uuid())
+  categoryId           String
+  name                 String
+  slug                 String   @unique
+  description          String
+  imageUrl             String?
+  basePricePaise       Int
+  estimatedDurationMin Int      @default(60)
+  isActive             Boolean  @default(true)
+  isFeatured           Boolean  @default(false)
+  isOnlineBookable     Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  category     ServiceCategory @relation(fields: [categoryId], references: [id])
+  bookingItems BookingItem[]
+
+  @@index([categoryId])
+  @@map("services")
+}
+
+// ---------- Scheduling ----------
+model SlotOverride {
+  id        String   @id @default(uuid())
+  date      DateTime @db.Date
+  startTime String? // "HH:mm"; empty means the whole day
+  capacity  Int? // overrides the default capacity
+  isClosed  Boolean  @default(false)
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+  @@map("slot_overrides")
+}
+
+// ---------- Bookings ----------
+model Booking {
+  id                  String        @id @default(uuid())
+  bookingRef          String        @unique
+  customerId          String
+  motorcycleId        String
+  scheduledStart      DateTime // stored in UTC
+  scheduledEnd        DateTime
+  status              BookingStatus @default(PENDING)
+  source              BookingSource @default(ONLINE)
+  customerNote        String?
+  internalNote        String?
+  assignedMechanicId  String?
+  estimatedTotalPaise Int           @default(0)
+  finalTotalPaise     Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  customer         Customer               @relation(fields: [customerId], references: [id])
+  motorcycle       Motorcycle             @relation(fields: [motorcycleId], references: [id])
+  assignedMechanic User?                  @relation("AssignedMechanic", fields: [assignedMechanicId], references: [id])
+  items            BookingItem[]
+  statusHistory    BookingStatusHistory[]
+
+  @@index([scheduledStart, status])
+  @@index([customerId])
+  @@index([motorcycleId])
+  @@map("bookings")
+}
+
+model BookingItem {
+  id                  String   @id @default(uuid())
+  bookingId           String
+  serviceId           String?
+  serviceNameSnapshot String // copied at booking time
+  unitPricePaise      Int // copied at booking time
+  quantity            Int      @default(1)
+  isAdditional        Boolean  @default(false) // added after inspection
+  addedById           String?
+  createdAt           DateTime @default(now())
+
+  booking Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  service Service? @relation(fields: [serviceId], references: [id])
+  addedBy User?    @relation(fields: [addedById], references: [id])
+
+  @@index([bookingId])
+  @@map("booking_items")
+}
+
+model BookingStatusHistory {
+  id          String         @id @default(uuid())
+  bookingId   String
+  fromStatus  BookingStatus?
+  toStatus    BookingStatus
+  changedById String?
+  note        String?
+  changedAt   DateTime       @default(now())
+
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  changedBy User?   @relation(fields: [changedById], references: [id])
+
+  @@index([bookingId])
+  @@map("booking_status_history")
+}
