@@ -5,23 +5,38 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { Module } from '@nestjs/common';
-import { createObserveModule } from '@nestjs/observe';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-export const { ObserveModule, ObserveInstrument } = createObserveModule();
+import { AuthModule } from './auth/auth.module.js';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
+import { RolesGuard } from './common/guards/roles.guard.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { ServiceCategoriesModule } from './service-categories/service-categories.module.js';
+import { ServicesModule } from './services/services.module.js';
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     Module({
         imports: [
-            ObserveModule.forRoot({
-                appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
-                appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
-                serviceId: 'backend',
-            }),
+            ConfigModule.forRoot({ isGlobal: true }),
+            ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+            JwtModule.register({ global: true }),
+            PrismaModule,
+            AuthModule,
+            ServiceCategoriesModule,
+            ServicesModule,
         ],
         controllers: [AppController],
-        providers: [AppService],
+        providers: [
+            AppService,
+            { provide: APP_GUARD, useClass: ThrottlerGuard },
+            { provide: APP_GUARD, useClass: JwtAuthGuard },
+            { provide: APP_GUARD, useClass: RolesGuard },
+        ],
     })
 ], AppModule);
 export { AppModule };
