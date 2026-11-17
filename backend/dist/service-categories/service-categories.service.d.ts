@@ -18,8 +18,8 @@ export declare class ServiceCategoriesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        sortOrder: number;
         slug: string;
+        sortOrder: number;
     })[]>;
     create(dto: CreateCategoryDto): Promise<{
         id: string;
@@ -27,8 +27,8 @@ export declare class ServiceCategoriesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        sortOrder: number;
         slug: string;
+        sortOrder: number;
     }>;
     update(id: string, dto: UpdateCategoryDto): Promise<{
         id: string;
@@ -36,8 +36,8 @@ export declare class ServiceCategoriesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        sortOrder: number;
         slug: string;
+        sortOrder: number;
     }>;
     remove(id: string): Promise<{
         message: string;

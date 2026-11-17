@@ -1,0 +1,414 @@
+import type { RequestWithUser } from '../common/types/auth-user.js';
+import { BookingsService } from './bookings.service.js';
+import { AdminCreateBookingDto, AssignMechanicDto, ChangeStatusDto, CreateBookingDto, ListBookingsQuery, RescheduleDto, TrackBookingDto } from './dto/bookings.dto.js';
+export declare class PublicBookingsController {
+    private readonly bookings;
+    constructor(bookings: BookingsService);
+    create(dto: CreateBookingDto): Promise<{
+        bookingRef: string;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        estimatedTotalPaise: number;
+        paymentMethod: string;
+        services: {
+            name: string;
+            pricePaise: number;
+            quantity: number;
+        }[];
+    }>;
+    track(dto: TrackBookingDto): Promise<{
+        bookingRef: string;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        estimatedTotalPaise: number;
+        finalTotalPaise: number | null;
+        paymentMethod: string;
+        motorcycle: {
+            brand: string;
+            model: string;
+        };
+        services: {
+            name: string;
+            pricePaise: number;
+            quantity: number;
+        }[];
+    }>;
+}
+export declare class BookingsController {
+    private readonly bookings;
+    constructor(bookings: BookingsService);
+    list(query: ListBookingsQuery, req: RequestWithUser): Promise<{
+        items: ({
+            customer: {
+                id: string;
+                name: string;
+                phone: string;
+            };
+            motorcycle: {
+                id: string;
+                brand: string;
+                model: string;
+                registrationNumber: string;
+            };
+            assignedMechanic: {
+                id: string;
+                name: string;
+            } | null;
+            items: {
+                id: string;
+                createdAt: Date;
+                serviceId: string | null;
+                serviceNameSnapshot: string;
+                unitPricePaise: number;
+                quantity: number;
+                isAdditional: boolean;
+                addedById: string | null;
+                bookingId: string;
+            }[];
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            bookingRef: string;
+            customerId: string;
+            motorcycleId: string;
+            scheduledStart: Date;
+            scheduledEnd: Date;
+            status: import("@prisma/client").$Enums.BookingStatus;
+            source: import("@prisma/client").$Enums.BookingSource;
+            customerNote: string | null;
+            internalNote: string | null;
+            assignedMechanicId: string | null;
+            estimatedTotalPaise: number;
+            finalTotalPaise: number | null;
+        })[];
+        meta: {
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
+    }>;
+    detail(id: string, req: RequestWithUser): Promise<{
+        customer: {
+            id: string;
+            name: string;
+            email: string | null;
+            phone: string;
+        };
+        motorcycle: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            brand: string;
+            model: string;
+            registrationNumber: string;
+            type: import("@prisma/client").$Enums.MotorcycleType;
+            manufacturingYear: number | null;
+            chassisNumber: string | null;
+        };
+        assignedMechanic: {
+            id: string;
+            name: string;
+        } | null;
+        items: {
+            id: string;
+            createdAt: Date;
+            serviceId: string | null;
+            serviceNameSnapshot: string;
+            unitPricePaise: number;
+            quantity: number;
+            isAdditional: boolean;
+            addedById: string | null;
+            bookingId: string;
+        }[];
+        statusHistory: ({
+            changedBy: {
+                name: string;
+            } | null;
+        } & {
+            id: string;
+            note: string | null;
+            changedAt: Date;
+            fromStatus: import("@prisma/client").$Enums.BookingStatus | null;
+            toStatus: import("@prisma/client").$Enums.BookingStatus;
+            changedById: string | null;
+            bookingId: string;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bookingRef: string;
+        customerId: string;
+        motorcycleId: string;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        source: import("@prisma/client").$Enums.BookingSource;
+        customerNote: string | null;
+        internalNote: string | null;
+        assignedMechanicId: string | null;
+        estimatedTotalPaise: number;
+        finalTotalPaise: number | null;
+    }>;
+    create(dto: AdminCreateBookingDto, req: RequestWithUser): Promise<{
+        customer: {
+            id: string;
+            name: string;
+            email: string | null;
+            phone: string;
+        };
+        motorcycle: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            brand: string;
+            model: string;
+            registrationNumber: string;
+            type: import("@prisma/client").$Enums.MotorcycleType;
+            manufacturingYear: number | null;
+            chassisNumber: string | null;
+        };
+        assignedMechanic: {
+            id: string;
+            name: string;
+        } | null;
+        items: {
+            id: string;
+            createdAt: Date;
+            serviceId: string | null;
+            serviceNameSnapshot: string;
+            unitPricePaise: number;
+            quantity: number;
+            isAdditional: boolean;
+            addedById: string | null;
+            bookingId: string;
+        }[];
+        statusHistory: ({
+            changedBy: {
+                name: string;
+            } | null;
+        } & {
+            id: string;
+            note: string | null;
+            changedAt: Date;
+            fromStatus: import("@prisma/client").$Enums.BookingStatus | null;
+            toStatus: import("@prisma/client").$Enums.BookingStatus;
+            changedById: string | null;
+            bookingId: string;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bookingRef: string;
+        customerId: string;
+        motorcycleId: string;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        source: import("@prisma/client").$Enums.BookingSource;
+        customerNote: string | null;
+        internalNote: string | null;
+        assignedMechanicId: string | null;
+        estimatedTotalPaise: number;
+        finalTotalPaise: number | null;
+    }>;
+    changeStatus(id: string, dto: ChangeStatusDto, req: RequestWithUser): Promise<({
+        customer: {
+            id: string;
+            name: string;
+            email: string | null;
+            phone: string;
+        };
+        motorcycle: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            brand: string;
+            model: string;
+            registrationNumber: string;
+            type: import("@prisma/client").$Enums.MotorcycleType;
+            manufacturingYear: number | null;
+            chassisNumber: string | null;
+        };
+        assignedMechanic: {
+            id: string;
+            name: string;
+        } | null;
+        items: {
+            id: string;
+            createdAt: Date;
+            serviceId: string | null;
+            serviceNameSnapshot: string;
+            unitPricePaise: number;
+            quantity: number;
+            isAdditional: boolean;
+            addedById: string | null;
+            bookingId: string;
+        }[];
+        statusHistory: ({
+            changedBy: {
+                name: string;
+            } | null;
+        } & {
+            id: string;
+            note: string | null;
+            changedAt: Date;
+            fromStatus: import("@prisma/client").$Enums.BookingStatus | null;
+            toStatus: import("@prisma/client").$Enums.BookingStatus;
+            changedById: string | null;
+            bookingId: string;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bookingRef: string;
+        customerId: string;
+        motorcycleId: string;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        source: import("@prisma/client").$Enums.BookingSource;
+        customerNote: string | null;
+        internalNote: string | null;
+        assignedMechanicId: string | null;
+        estimatedTotalPaise: number;
+        finalTotalPaise: number | null;
+    }) | null>;
+    reschedule(id: string, dto: RescheduleDto, req: RequestWithUser): Promise<({
+        customer: {
+            id: string;
+            name: string;
+            email: string | null;
+            phone: string;
+        };
+        motorcycle: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            brand: string;
+            model: string;
+            registrationNumber: string;
+            type: import("@prisma/client").$Enums.MotorcycleType;
+            manufacturingYear: number | null;
+            chassisNumber: string | null;
+        };
+        assignedMechanic: {
+            id: string;
+            name: string;
+        } | null;
+        items: {
+            id: string;
+            createdAt: Date;
+            serviceId: string | null;
+            serviceNameSnapshot: string;
+            unitPricePaise: number;
+            quantity: number;
+            isAdditional: boolean;
+            addedById: string | null;
+            bookingId: string;
+        }[];
+        statusHistory: ({
+            changedBy: {
+                name: string;
+            } | null;
+        } & {
+            id: string;
+            note: string | null;
+            changedAt: Date;
+            fromStatus: import("@prisma/client").$Enums.BookingStatus | null;
+            toStatus: import("@prisma/client").$Enums.BookingStatus;
+            changedById: string | null;
+            bookingId: string;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bookingRef: string;
+        customerId: string;
+        motorcycleId: string;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        source: import("@prisma/client").$Enums.BookingSource;
+        customerNote: string | null;
+        internalNote: string | null;
+        assignedMechanicId: string | null;
+        estimatedTotalPaise: number;
+        finalTotalPaise: number | null;
+    }) | null>;
+    assign(id: string, dto: AssignMechanicDto, req: RequestWithUser): Promise<({
+        customer: {
+            id: string;
+            name: string;
+            email: string | null;
+            phone: string;
+        };
+        motorcycle: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            customerId: string;
+            brand: string;
+            model: string;
+            registrationNumber: string;
+            type: import("@prisma/client").$Enums.MotorcycleType;
+            manufacturingYear: number | null;
+            chassisNumber: string | null;
+        };
+        assignedMechanic: {
+            id: string;
+            name: string;
+        } | null;
+        items: {
+            id: string;
+            createdAt: Date;
+            serviceId: string | null;
+            serviceNameSnapshot: string;
+            unitPricePaise: number;
+            quantity: number;
+            isAdditional: boolean;
+            addedById: string | null;
+            bookingId: string;
+        }[];
+        statusHistory: ({
+            changedBy: {
+                name: string;
+            } | null;
+        } & {
+            id: string;
+            note: string | null;
+            changedAt: Date;
+            fromStatus: import("@prisma/client").$Enums.BookingStatus | null;
+            toStatus: import("@prisma/client").$Enums.BookingStatus;
+            changedById: string | null;
+            bookingId: string;
+        })[];
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bookingRef: string;
+        customerId: string;
+        motorcycleId: string;
+        scheduledStart: Date;
+        scheduledEnd: Date;
+        status: import("@prisma/client").$Enums.BookingStatus;
+        source: import("@prisma/client").$Enums.BookingSource;
+        customerNote: string | null;
+        internalNote: string | null;
+        assignedMechanicId: string | null;
+        estimatedTotalPaise: number;
+        finalTotalPaise: number | null;
+    }) | null>;
+}

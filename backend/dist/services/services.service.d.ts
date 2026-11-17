@@ -46,8 +46,8 @@ export declare class ServicesService {
             name: string;
             isActive: boolean;
             updatedAt: Date;
-            slug: string;
             categoryId: string;
+            slug: string;
             description: string;
             imageUrl: string | null;
             basePricePaise: number;
@@ -69,8 +69,8 @@ export declare class ServicesService {
             name: string;
             isActive: boolean;
             updatedAt: Date;
-            sortOrder: number;
             slug: string;
+            sortOrder: number;
         };
     } & {
         id: string;
@@ -78,8 +78,8 @@ export declare class ServicesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        slug: string;
         categoryId: string;
+        slug: string;
         description: string;
         imageUrl: string | null;
         basePricePaise: number;
@@ -93,8 +93,8 @@ export declare class ServicesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        slug: string;
         categoryId: string;
+        slug: string;
         description: string;
         imageUrl: string | null;
         basePricePaise: number;
@@ -108,8 +108,8 @@ export declare class ServicesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        slug: string;
         categoryId: string;
+        slug: string;
         description: string;
         imageUrl: string | null;
         basePricePaise: number;
@@ -123,8 +123,8 @@ export declare class ServicesService {
         name: string;
         isActive: boolean;
         updatedAt: Date;
-        slug: string;
         categoryId: string;
+        slug: string;
         description: string;
         imageUrl: string | null;
         basePricePaise: number;

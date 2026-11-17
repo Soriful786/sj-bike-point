@@ -6,6 +6,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
+import { BookingSlotsModule } from './booking-slots/booking-slots.module.js';
+import { BookingsModule } from './bookings/bookings.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { RolesGuard } from './common/guards/roles.guard.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -21,6 +23,8 @@ import { ServicesModule } from './services/services.module.js';
     AuthModule,
     ServiceCategoriesModule,
     ServicesModule,
+    BookingSlotsModule,
+    BookingsModule,
   ],
   controllers: [AppController],
   providers: [
